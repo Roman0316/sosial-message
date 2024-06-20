@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: "MyProject"
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - "${PGPORT}:${PGPORT}"
