@@ -36,25 +36,8 @@ async function changePassword({ email }, { currentPassword, password }) {
   return user.save();
 }
 
-async function changeUserData({ email }, { firstName, lastName }) {
-  const updateUser = await User.update(
-    {
-      firstName,
-      lastName,
-    },
-    {
-      where: { email },
-      returning: true,
-      plain: true,
-    },
-  );
-  // if (updateUser.length ===0)  !дописать тип ошибки!
-  return updateUser;
-}
-
 module.exports = {
   registerUser,
   loginUser,
   changePassword,
-  changeUserData,
 };

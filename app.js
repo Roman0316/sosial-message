@@ -1,8 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const { authRouter } = require('./routers/index');
-const ErrorHandler = require('./middlewares/error');
+const { authRouter, userRouter } = require('./routers/index');
+const { ErrorHandler, authMiddleware } = require('./middlewares/index');
 
 const app = express();
 
@@ -15,6 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRouter);
+app.use(authMiddleware);
+app.use('/api/user', userRouter);
 
 app.use(ErrorHandler);
 
