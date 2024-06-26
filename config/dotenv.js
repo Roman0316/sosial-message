@@ -1,5 +1,9 @@
 require('dotenv').config();
 
+const PORT = process.env.API_PORT;
+
+const secret = process.env.JWT_ACCESS_SECRET_KEY;
+
 const dbConfig = {
   host: process.env.PGHOST,
   user: process.env.PGUSER,
@@ -8,8 +12,6 @@ const dbConfig = {
   port: process.env.PGPORT,
   dialect: 'postgres',
 };
-
-const PORT = process.env.API_PORT;
 
 // sequelize cli required environments
 const production = dbConfig;
@@ -20,4 +22,5 @@ module.exports = {
   PORT,
   production,
   development,
+  secret,
 };

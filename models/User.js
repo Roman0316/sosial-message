@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize');
+// const { v4: uuidv4 } = require('uuid');
 
 const BaseModel = require('./BaseModel');
 
@@ -12,6 +13,7 @@ module.exports = class User extends BaseModel {
   static Schema = {
     id: {
       type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     firstName: {
