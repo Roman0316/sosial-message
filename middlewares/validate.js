@@ -1,7 +1,7 @@
 const { BadRequest } = require('http-errors');
 const { validationResult, matchedData } = require('express-validator');
 
-const ErrorMessages = require('../constants/errorMessages');
+const ErrorMessages = require('../constants/index');
 
 function getErrorMessage(errors) {
   const {

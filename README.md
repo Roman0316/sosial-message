@@ -6,3 +6,4 @@
 - `npm run migrate:undo`: Rollback the last migration
 - `npm run migrate:undo:all`: Rollback all migrations
 - `npm run migration:create`: Create a new migration
+- `npm run seed:admin`: Create the first admin

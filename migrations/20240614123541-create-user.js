@@ -25,6 +25,11 @@ module.exports = {
         allowNull: false,
         protected: true,
       },
+      role: {
+        type: DataTypes.ENUM('admin', 'user'),
+        allowNull: false,
+        defaultValue: 'user',
+      },
       createdAt: {
         type: DataTypes.DATE,
       },

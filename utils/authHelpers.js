@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { BadRequest } = require('http-errors');
 
-const ErrorMessages = require('../constants/errorMessages');
+const ErrorMessages = require('../constants/index');
 const { secret } = require('../config/dotenv');
 
 function hashPassword(password) {

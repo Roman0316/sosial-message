@@ -1,7 +1,7 @@
 const { Unauthorized } = require('http-errors');
 
 const { secret } = require('../config/dotenv');
-const ErrorMessages = require('../constants/errorMessages');
+const ErrorMessages = require('../constants/index');
 const { verifyToken } = require('../utils/authHelpers');
 
 module.exports = function authMiddleware(req, res, next) {

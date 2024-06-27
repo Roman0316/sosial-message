@@ -1,7 +1,7 @@
 const { BadRequest, Unauthorized } = require('http-errors');
 
 const User = require('../models/User');
-const ErrorMessages = require('../constants/errorMessages');
+const ErrorMessages = require('../constants/index');
 const { hashPassword, comparePasswords, generateAccessToken } = require('../utils/authHelpers');
 
 async function registerUser({ firstName, email, password }) {

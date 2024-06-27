@@ -7,10 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
+    
     "migrate:run": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "migrate:undo:all": "sequelize db:migrate:undo:all",
-    "migration:create": "sequelize migration:create --name "
+    "migration:create": "sequelize migration:create --name",
+
+    "seed:run": "sequelize db:seed:all",
+    "seed:create": "sequelize seed:create --name ",
+    "seed:undo": "sequelize db:seed:undo --seed 20240627110311-admin.js",
+    "seed:undo:all": "sequelize db:seed:undo:all",
+    "seed:admin": "sequelize db:seed --seed 20240627110311-admin.js"
+
   },
   "author": "Roman",
   "license": "ISC",
