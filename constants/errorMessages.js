@@ -6,6 +6,8 @@ const ErrorMessages = {
   auth_missing_jwt_token: 'auth_missing_jwt_token',
 
   missing_required_field: 'missing_required_field',
+
+  user_not_found: 'user_not_found',
 };
 
 module.exports = ErrorMessages;

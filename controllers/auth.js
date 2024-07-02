@@ -1,6 +1,6 @@
 const { BadRequest, Unauthorized } = require('http-errors');
 
-const User = require('../models/User');
+const { User } = require('../models/index');
 const ErrorMessages = require('../constants/index');
 const { hashPassword, comparePasswords, generateAccessToken } = require('../utils/authHelpers');
 

@@ -40,4 +40,11 @@ module.exports = class User extends BaseModel {
       allowNull: false,
     },
   };
+
+  static associate(models) {
+    User.hasMany(models.post, {
+      foreignKey: 'userId',
+      // as: 'posts',
+    });
+  }
 };

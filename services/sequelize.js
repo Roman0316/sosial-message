@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const { dbConfig } = require('../config/dotenv');
 
-const User = require('../models/User');
+const { User, Post } = require('../models/index');
 
 const {
   host, user, database, password, port, dialect,
@@ -15,8 +15,14 @@ const sequelize = new Sequelize(database, user, password, {
 
 // initialize models
 User.initialize(sequelize);
+Post.initialize(sequelize);
+
+// associate models
+User.associate(sequelize.models);
+Post.associate(sequelize.models);
 
 module.exports = {
   sequelize,
   User,
+  Post,
 };

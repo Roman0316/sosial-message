@@ -1,4 +1,7 @@
-const User = require('../models/User');
+const { NotFound } = require('http-errors');
+
+const { User } = require('../models/index');
+const { ErrorMessages } = require('../constants/index');
 
 async function getUserProfile({ id }) {
   return User.findOneOrFail({ id }, {
@@ -8,19 +11,19 @@ async function getUserProfile({ id }) {
   });
 }
 
-async function changeUserProfile({ email }, { firstName, lastName }) {
+async function changeUserProfile({ id }, { firstName, lastName }) {
   const updateUser = await User.update(
     {
       firstName,
       lastName,
     },
     {
-      where: { email },
+      where: { id },
       returning: true,
       plain: true,
     },
   );
-    // if (updateUser.length ===0)  !дописать тип ошибки!
+  if (updateUser.length === 0) throw new NotFound(ErrorMessages.user_not_found);
   return updateUser;
 }
 
@@ -34,7 +37,7 @@ async function getUsersList({ orderBy, typeOfSort }) {
       exclude: ['password'],
     },
     order: [
-      // ['createdAt', 'ASC'],
+      ['role', 'ASC'],
       [orderBy, typeOfSort]],
 
   });
