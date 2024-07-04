@@ -16,44 +16,8 @@ module.exports = {
           key: 'id',
         },
       },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      content: {
+      text: {
         type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      imageUrl: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      videoUrl: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      likesCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-      },
-      commentsCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-      },
-      sharedCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-      },
-      isPublished: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        allowNull: false,
-      },
-      tags: {
-        type: DataTypes.STRING,
         allowNull: true,
       },
       createdAt: {
@@ -62,10 +26,6 @@ module.exports = {
       updatedAt: {
         type: DataTypes.DATE,
       },
-      deletedAt: {
-        type: DataTypes.DATE,
-      },
-
     });
   },
 

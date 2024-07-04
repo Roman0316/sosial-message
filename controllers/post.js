@@ -1,34 +1,48 @@
-const { Post, User } = require('../models/index');
+const {
+  Post, User, Tag, PostTag,
+} = require('../models/index');
 
-async function getAllPosts() {
-  return Post.findAll();
-}
-
-async function createPost({ id }, {
-  title, content, imageUrl, videoUrl, likesCount, commentsCount, sharedCount, isPublished, tags,
+// работа с фильтрами
+// Сначала новые
+// Сначала Старые
+// по тегу
+// получиьть только те посты которые нравятся
+async function getAllPosts({
+  tag,
+  // createdAt, isLike = false, userId = 1,
 }) {
-  return Post.create({
-    userId: id,
-    title,
-    content,
-    imageUrl,
-    videoUrl,
-    likesCount,
-    commentsCount,
-    sharedCount,
-    isPublished,
-    tags,
-  });
-}
+  const where = {};
+  const include = [];
 
-async function getAllUserPosts({ id }, { typeOfSort }) {
-  return Post.findAll({
-    where: { userId: id },
-    order: [['createdAt', typeOfSort]],
-    attributes: {
-      exclude: ['id', 'userId', 'isPublished'],
+  // if (createdAt) {
+  //   where.createdAt = createdAt;
+  // }
+  // if (userId) {
+  //   where.userId = userId;
+  // }
+
+  include.push(
+    {
+      model: Tag,
+      // where: {}, условие если пришли теги по фильтру
+      through: {
+        model: PostTag,
+        attributes: [],
+      },
     },
-  });
+  );
+
+  // if (isLike) {
+  //   include.push({
+  //     // model: Post
+  //     // througth: Like
+  //     include: [{
+
+  //     }]
+  //   });
+  // }
+
+  return Post.findAll({ where, include });
 }
 
 async function getUserPost({ id }, { postId }) {
@@ -38,37 +52,77 @@ async function getUserPost({ id }, { postId }) {
       userId: id,
     },
     attributes: {
-      exclude: ['isPublished'],
+      exclude: ['id', 'userId', 'isPublished'],
     },
     include: [{
       model: User,
       as: 'user',
-      attributes: ['firstName', 'email'],
+      attributes: ['firstName', 'id'],
     }],
   });
   return post;
 }
 
+async function createPost({ id }, {
+  text, tags,
+}) {
+  const result = await Promise.all(tags.map((value) => Tag.create({ value })));
+
+  const post = await Post.create({
+    userId: id,
+    text,
+    tags,
+  });
+
+  await PostTag.create({ postId: post.id, tagId: result[0].id });
+
+  return post.get();
+}
+
 async function changeUserPost({ id }, { postId }, {
-  title, content, imageUrl, videoUrl, tags,
+  text,
 }) {
   const post = await Post.findOne({
     where: {
       id: postId,
       userId: id,
     },
-    attributes: ['id', 'title', 'content', 'imageUrl', 'videoUrl', 'tags'],
+    attributes: [
+      'id',
+      'text',
+      // 'content',
+      // 'imageUrl',
+      // 'videoUrl',
+      // 'tags',
+    ],
   });
+
+  if (!post) {
+    const err = new Error('No post');
+    err.status = 400;
+    throw err;
+  }
+
   post.set({
-    title,
-    content,
-    imageUrl,
-    videoUrl,
-    tags,
+    text,
+    // content,
+    // imageUrl,
+    // videoUrl,
+    // tags,
   });
   await post.save();
   return post.get();
 }
+
+/* async function getAllUserPosts({ id }, { typeOfSort }) {
+  return Post.findAll({
+    where: { userId: id },
+    order: [['createdAt', typeOfSort]],
+    attributes: {
+      exclude: ['id', 'userId', 'isPublished'],
+    },
+  });
+} */
 
 async function deleteUserPost({ id }, { postId }) {
   await Post.destroy({
@@ -79,10 +133,6 @@ async function deleteUserPost({ id }, { postId }) {
   });
 }
 
-async function deleteAllUserPosts({ id }) {
-  await Post.destroy({ where: { userId: id } });
-}
-
 module.exports = {
   getAllPosts,
   createPost,
@@ -90,5 +140,4 @@ module.exports = {
   getUserPost,
   changeUserPost,
   deleteUserPost,
-  deleteAllUserPosts,
 };

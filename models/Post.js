@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const { v4: uuid } = require('uuid');
 
 const BaseModel = require('./BaseModel');
 
@@ -8,7 +7,7 @@ module.exports = class Post extends BaseModel {
 
   static tableName = 'posts';
 
-  static protectedKeys = ['createdAt', 'updatedAt', 'deletedAt'];
+  static protectedKeys = ['createdAt', 'updatedAt'];
 
   static Schema = {
     id: {
@@ -24,44 +23,8 @@ module.exports = class Post extends BaseModel {
         key: 'id',
       },
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    content: {
+    text: {
       type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    imageUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    videoUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    likesCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    commentsCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    sharedCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    isPublished: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-      allowNull: false,
-    },
-    tags: {
-      type: DataTypes.STRING,
       allowNull: true,
     },
   };
@@ -69,7 +32,19 @@ module.exports = class Post extends BaseModel {
   static associate(models) {
     Post.belongsTo(models.user, {
       foreignKey: 'userId',
-      // as: 'user',
+    });
+
+    Post.hasMany(models.postTag, {
+      foreignKey: 'postId',
+      allowNull: false,
+    });
+
+    Post.belongsToMany(models.tag, {
+      foreignKey: {
+        name: 'postId',
+        allowNull: false,
+      },
+      through: models.postTag,
     });
   }
 };
