@@ -4,14 +4,15 @@ const { User } = require('../models/index');
 const { ErrorMessages } = require('../constants/index');
 
 async function getUserProfile({ id }) {
-  return User.findOneOrFail({ id }, {
+  return User.findOneOrFail({
+    where: { id },
     attributes: {
       exclude: ['password'],
     },
   });
 }
 
-async function changeUserProfile({ id }, { firstName, lastName }) {
+async function updateUserProfile({ id }, { firstName, lastName }) {
   const updateUser = await User.update(
     {
       firstName,
@@ -31,7 +32,7 @@ async function deleteUserProfile({ id }) {
   await User.destroy({ where: { id } }); // протестировать!
 }
 
-async function getUsersList({ orderBy, typeOfSort }) {
+async function getUserList({ orderBy, typeOfSort }) {
   const { count, rows: users } = await User.findAndCountAll({
     attributes: {
       exclude: ['password'],
@@ -46,7 +47,7 @@ async function getUsersList({ orderBy, typeOfSort }) {
 
 module.exports = {
   getUserProfile,
-  changeUserProfile,
+  updateUserProfile,
   deleteUserProfile,
-  getUsersList,
+  getUserList,
 };

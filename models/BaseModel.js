@@ -18,8 +18,14 @@ module.exports = class BaseModel extends Model {
     });
   }
 
-  static async findOneOrFail(where, options = {}) {
-    const doc = await this.findOne({ where, ...options });
+  /**
+   * @param {object} options
+   * @param {object=} options.where
+   * @param {array<object>=} options.include
+   * @param {array<string>=} options.attributes
+   */
+  static async findOneOrFail(options = {}) {
+    const doc = await this.findOne(options);
     if (!doc) {
       throw new NotFound(this.modelName);
     }

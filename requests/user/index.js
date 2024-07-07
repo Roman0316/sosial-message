@@ -1,7 +1,7 @@
-const changeUserProfileRequest = require('./changeUserProfileRequest');
-const getUsersListRequest = require('./getUsersListRequest');
+const updateUserProfileRequest = require('./updateUserProfileRequest');
+const getUserListRequest = require('./getUserListRequest');
 
 module.exports = {
-  changeUserProfileRequest,
-  getUsersListRequest,
+  updateUserProfileRequest,
+  getUserListRequest,
 };

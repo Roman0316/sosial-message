@@ -2,54 +2,28 @@ const {
   Post, User, Tag, PostTag,
 } = require('../models/index');
 
-// работа с фильтрами
-// Сначала новые
-// Сначала Старые
-// по тегу
-// получиьть только те посты которые нравятся
-async function getAllPosts({
-  tag,
-  // createdAt, isLike = false, userId = 1,
-}) {
-  const where = {};
-  const include = [];
-
-  // if (createdAt) {
-  //   where.createdAt = createdAt;
-  // }
-  // if (userId) {
-  //   where.userId = userId;
-  // }
-
-  include.push(
-    {
-      model: Tag,
-      // where: {}, условие если пришли теги по фильтру
-      through: {
-        model: PostTag,
-        attributes: [],
+async function getPostList({ tag, limit, offset }) {
+  const posts = await Post.findAll({
+    include: [
+      {
+        model: Tag,
+        // where
+        through: {
+          model: PostTag,
+          attributes: [],
+        },
       },
-    },
-  );
+    ],
+  });
 
-  // if (isLike) {
-  //   include.push({
-  //     // model: Post
-  //     // througth: Like
-  //     include: [{
-
-  //     }]
-  //   });
-  // }
-
-  return Post.findAll({ where, include });
+  return posts.map((p) => p.get());
 }
 
-async function getUserPost({ id }, { postId }) {
+async function getPost({ id: userId }, { postId }) {
   const post = await Post.findOne({
     where: {
       id: postId,
-      userId: id,
+      userId,
     },
     attributes: {
       exclude: ['id', 'userId', 'isPublished'],
@@ -60,18 +34,15 @@ async function getUserPost({ id }, { postId }) {
       attributes: ['firstName', 'id'],
     }],
   });
-  return post;
+  return post.get();
 }
 
-async function createPost({ id }, {
-  text, tags,
-}) {
+async function createPost({ id: userId }, { text, tags }) {
   const result = await Promise.all(tags.map((value) => Tag.create({ value })));
 
   const post = await Post.create({
-    userId: id,
+    userId,
     text,
-    tags,
   });
 
   await PostTag.create({ postId: post.id, tagId: result[0].id });
@@ -79,7 +50,7 @@ async function createPost({ id }, {
   return post.get();
 }
 
-async function changeUserPost({ id }, { postId }, {
+async function updatePost({ id }, { postId }, {
   text,
 }) {
   const post = await Post.findOne({
@@ -90,10 +61,6 @@ async function changeUserPost({ id }, { postId }, {
     attributes: [
       'id',
       'text',
-      // 'content',
-      // 'imageUrl',
-      // 'videoUrl',
-      // 'tags',
     ],
   });
 
@@ -102,29 +69,14 @@ async function changeUserPost({ id }, { postId }, {
     err.status = 400;
     throw err;
   }
-
   post.set({
     text,
-    // content,
-    // imageUrl,
-    // videoUrl,
-    // tags,
   });
   await post.save();
   return post.get();
 }
 
-/* async function getAllUserPosts({ id }, { typeOfSort }) {
-  return Post.findAll({
-    where: { userId: id },
-    order: [['createdAt', typeOfSort]],
-    attributes: {
-      exclude: ['id', 'userId', 'isPublished'],
-    },
-  });
-} */
-
-async function deleteUserPost({ id }, { postId }) {
+async function deletePost({ id }, { postId }) {
   await Post.destroy({
     where: {
       id: postId,
@@ -134,10 +86,9 @@ async function deleteUserPost({ id }, { postId }) {
 }
 
 module.exports = {
-  getAllPosts,
+  getPostList,
   createPost,
-  getAllUserPosts,
-  getUserPost,
-  changeUserPost,
-  deleteUserPost,
+  getPost,
+  updatePost,
+  deletePost,
 };

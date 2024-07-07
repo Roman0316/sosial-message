@@ -1,6 +1,6 @@
 const { query } = require('express-validator');
 
-const getUsersListRequest = [
+const getUserListRequest = [
   query('orderBy')
     .default('firstName')
     .isString()
@@ -15,4 +15,4 @@ const getUsersListRequest = [
     .withMessage('The isAsc cannot be less than 3 and more than 255 characters'),
 ];
 
-module.exports = getUsersListRequest;
+module.exports = getUserListRequest;

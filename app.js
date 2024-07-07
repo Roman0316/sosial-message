@@ -16,8 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRouter);
 app.use(authMiddleware);
-app.use('/api/user', userRouter);
-app.use('/api/post', postRouter);
+app.use('/api/users', userRouter);
+app.use('/api/posts', postRouter);
 
 app.use(ErrorHandler);
 

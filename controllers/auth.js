@@ -29,7 +29,7 @@ async function loginUser({ email, password }) {
 }
 
 async function changePassword({ email }, { currentPassword, password }) {
-  const user = await User.findOneOrFail({ email });
+  const user = await User.findOneOrFail({ where: { email } });
   const isPasswordCorrect = await comparePasswords(currentPassword, user.password);
   if (!isPasswordCorrect) throw new BadRequest(ErrorMessages.auth_invalid_password);
   user.password = await hashPassword(password);
