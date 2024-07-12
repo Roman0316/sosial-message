@@ -29,7 +29,7 @@ async function updateUserProfile({ id }, { firstName, lastName }) {
 }
 
 async function deleteUserProfile({ id }) {
-  await User.destroy({ where: { id } }); // протестировать!
+  await User.destroy({ where: { id } });
 }
 
 async function getUserList({ orderBy, typeOfSort }) {

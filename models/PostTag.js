@@ -20,11 +20,11 @@ module.exports = class PostTag extends BaseModel {
   static associate(models) {
     PostTag.belongsTo(models.post, {
       foreignKey: 'postId',
-      allowNull: false,
     });
     PostTag.belongsTo(models.tag, {
       foreignKey: 'tagId',
       allowNull: false,
+      onDelete: 'CASCADE',
     });
   }
 };

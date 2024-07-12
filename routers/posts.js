@@ -43,7 +43,7 @@ postRouter.patch(
 postRouter.delete(
   '/:postId',
   wrap(async (req, res) => {
-    await postController.deletePost(req.user, req.query);
+    await postController.deletePost(req.user, req.params);
     res.status(204).end();
   }),
 );

@@ -36,6 +36,7 @@ module.exports = {
             model: { tableName: 'posts' },
             key: 'id',
           },
+          onDelete: 'CASCADE',
         },
         tagId: {
           type: DataTypes.UUID,
@@ -44,6 +45,7 @@ module.exports = {
             model: { tableName: 'tags' },
             key: 'id',
           },
+          onDelete: 'CASCADE',
         },
         createdAt: {
           type: DataTypes.DATE,

@@ -10,11 +10,12 @@ module.exports = {
       },
       userId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: { tableName: 'users' },
           key: 'id',
         },
+        onDelete: 'SET NULL',
       },
       text: {
         type: DataTypes.TEXT,

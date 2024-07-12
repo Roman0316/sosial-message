@@ -1,9 +1,12 @@
+const { BadRequest } = require('http-errors');
+const { ErrorMessages } = require('../constants/index');
+
 const {
   Post, User, Tag, PostTag,
 } = require('../models/index');
 
 async function getPostList({ tag, limit, offset }) {
-  const posts = await Post.findAll({
+/*  const posts = await Post.findAll({
     include: [
       {
         model: Tag,
@@ -16,9 +19,36 @@ async function getPostList({ tag, limit, offset }) {
     ],
   });
 
-  return posts.map((p) => p.get());
+  return posts.map((p) => p.get()); */
+  if (tag) {
+    const tagPost = await Tag.findOne({
+      where: { value: tag },
+      include: [{
+        model: Post,
+        through: {
+          model: PostTag,
+          attributes: [],
+        },
+      }],
+    });
+    return tagPost;
+  }
+  if (!tag) {
+    const postTag = await Post.findAll({
+      include: [{
+        model: Tag,
+        through: {
+          model: PostTag,
+          attributes: [],
+        },
+      }],
+    });
+    return postTag;
+  }
+  return null;
 }
 
+// получить конкретный пост пользователя
 async function getPost({ id: userId }, { postId }) {
   const post = await Post.findOne({
     where: {
@@ -37,26 +67,29 @@ async function getPost({ id: userId }, { postId }) {
   return post.get();
 }
 
+// создать пост
 async function createPost({ id: userId }, { text, tags }) {
-  const result = await Promise.all(tags.map((value) => Tag.create({ value })));
+  const tagResult = await Promise.all(tags.map((value) => Tag.findOrCreate({ where: { value } })));
+  const tag = tagResult.map((result) => result[0]);
 
   const post = await Post.create({
     userId,
     text,
   });
 
-  await PostTag.create({ postId: post.id, tagId: result[0].id });
+  await PostTag.create({ postId: post.id, tagId: tag[0].id });
 
-  return post.get();
+  return { post, tag };
 }
 
-async function updatePost({ id }, { postId }, {
+// изменить пост
+async function updatePost({ id: userId }, { postId }, {
   text,
 }) {
   const post = await Post.findOne({
     where: {
       id: postId,
-      userId: id,
+      userId,
     },
     attributes: [
       'id',
@@ -64,11 +97,8 @@ async function updatePost({ id }, { postId }, {
     ],
   });
 
-  if (!post) {
-    const err = new Error('No post');
-    err.status = 400;
-    throw err;
-  }
+  if (!post) throw new BadRequest(ErrorMessages.missing_required_field);
+
   post.set({
     text,
   });
@@ -76,6 +106,7 @@ async function updatePost({ id }, { postId }, {
   return post.get();
 }
 
+// удалить конкретный пост пользователя
 async function deletePost({ id }, { postId }) {
   await Post.destroy({
     where: {

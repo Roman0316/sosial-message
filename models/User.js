@@ -16,6 +16,7 @@ module.exports = class User extends BaseModel {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
@@ -43,8 +44,11 @@ module.exports = class User extends BaseModel {
 
   static associate(models) {
     User.hasMany(models.post, {
-      foreignKey: 'userId',
+      foreignKey: {
+        name: 'userId',
+        allowNull: true,
       // as: 'posts',
+      },
     });
   }
 };

@@ -17,11 +17,12 @@ module.exports = class Post extends BaseModel {
     },
     userId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: { tableName: 'users' },
         key: 'id',
       },
+      onDelete: 'SET NULL',
     },
     text: {
       type: DataTypes.TEXT,
@@ -31,7 +32,10 @@ module.exports = class Post extends BaseModel {
 
   static associate(models) {
     Post.belongsTo(models.user, {
-      foreignKey: 'userId',
+      foreignKey: {
+        name: 'userId',
+        allowNull: true,
+      },
     });
 
     Post.hasMany(models.postTag, {
