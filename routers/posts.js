@@ -2,8 +2,8 @@ const { Router } = require('express');
 
 const wrap = require('../utils/wrap');
 const { postController } = require('../controllers/index');
-const { validateRequest } = require('../middlewares/index');
-const { createPostRequest } = require('../requests/post/index');
+// const { validateRequest } = require('../middlewares/index');
+// const { createPostRequest } = require('../requests/post/index');
 
 const postRouter = Router();
 

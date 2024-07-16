@@ -1,7 +1,7 @@
 const { query } = require('express-validator');
 
-const deleteUserPostRequest = [
+const getPostRequest = [
   query('userId').exists().isUUID(),
 ];
 
-module.exports = deleteUserPostRequest;
+module.exports = getPostRequest;

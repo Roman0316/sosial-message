@@ -1,13 +1,13 @@
 const createPostRequest = require('./createPostRequest');
-const getAllUserPostsRequest = require('./getAllUserPostsRequest');
-const getUserPostRequest = require('./getUserPost');
-const changeUserPostRequest = require('./changeUserPostRequest');
-const deleteUserPostRequest = require('./deleteUserPostRequest');
+const getPostListRequest = require('./getPostListRequest');
+const getPostRequest = require('./getPostRequest');
+const updatePostRequest = require('./updatePostRequest');
+const deletePostRequest = require('./deletePostRequest');
 
 module.exports = {
   createPostRequest,
-  getAllUserPostsRequest,
-  getUserPostRequest,
-  changeUserPostRequest,
-  deleteUserPostRequest,
+  getPostListRequest,
+  getPostRequest,
+  updatePostRequest,
+  deletePostRequest,
 };

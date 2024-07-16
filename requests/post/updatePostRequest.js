@@ -1,6 +1,6 @@
 const { query, body } = require('express-validator');
 
-const changeUserPostRequest = [
+const updatePostRequest = [
   query('userId').exists().isUUID(),
   body('title').isString().isLength({ max: 255 })
     .withMessage('The title cannot be more than 255 characters')
@@ -14,4 +14,4 @@ const changeUserPostRequest = [
 
 ];
 
-module.exports = changeUserPostRequest;
+module.exports = updatePostRequest;

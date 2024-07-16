@@ -5,23 +5,27 @@ const {
   Post, User, Tag, PostTag,
 } = require('../models/index');
 
-async function getPostList({ tag, limit, offset }) {
-/*  const posts = await Post.findAll({
-    include: [
-      {
+// получить посты с фильтрами
+async function getPostList({
+  tag, limit, offset, typeOfSort, userId,
+}) {
+  if (userId) {
+    return Post.findAll({
+      where: { userId },
+      include: [{
         model: Tag,
-        // where
         through: {
           model: PostTag,
           attributes: [],
         },
-      },
-    ],
-  });
-
-  return posts.map((p) => p.get()); */
+      }],
+      order: [['createdAt', typeOfSort]],
+      limit,
+      offset,
+    });
+  }
   if (tag) {
-    const tagPost = await Tag.findOne({
+    const tagAndPosts = await Tag.findOne({
       where: { value: tag },
       include: [{
         model: Post,
@@ -31,21 +35,23 @@ async function getPostList({ tag, limit, offset }) {
         },
       }],
     });
-    return tagPost;
+    return tagAndPosts;
   }
-  if (!tag) {
-    const postTag = await Post.findAll({
-      include: [{
-        model: Tag,
-        through: {
-          model: PostTag,
-          attributes: [],
-        },
-      }],
-    });
-    return postTag;
-  }
-  return null;
+
+  const postsAndTags = await Post.findAll({
+    include: [{
+      model: Tag,
+      through: {
+        model: PostTag,
+        attributes: [],
+      },
+    }],
+    order: [['createdAt', typeOfSort]],
+    limit,
+    offset,
+  });
+    // return postTag.map((p) => p.get());
+  return postsAndTags;
 }
 
 // получить конкретный пост пользователя
