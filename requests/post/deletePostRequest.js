@@ -1,7 +1,7 @@
-const { query } = require('express-validator');
+const { param } = require('express-validator');
 
 const deletePostRequest = [
-  query('userId').exists().isUUID(),
+  param('postId').exists().isUUID(),
 ];
 
 module.exports = deletePostRequest;

@@ -8,6 +8,8 @@ const ErrorMessages = {
   missing_required_field: 'missing_required_field',
 
   user_not_found: 'user_not_found',
+
+  invalid_value_offset: 'invalid_value_offset',
 };
 
 module.exports = ErrorMessages;

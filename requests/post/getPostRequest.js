@@ -1,7 +1,7 @@
-const { query } = require('express-validator');
+const { param } = require('express-validator');
 
 const getPostRequest = [
-  query('userId').exists().isUUID(),
+  param('userId').isUUID(),
 ];
 
 module.exports = getPostRequest;

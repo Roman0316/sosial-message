@@ -1,4 +1,5 @@
 const { BadRequest } = require('http-errors');
+
 const { ErrorMessages } = require('../constants/index');
 
 const {
@@ -10,6 +11,10 @@ async function getPostList({
   tag, limit, offset, typeOfSort, userId,
 }) {
   if (userId) {
+    const userPostCount = await Post.count({
+      where: { userId },
+    });
+    if (offset > userPostCount) throw new BadRequest(ErrorMessages.invalid_value_offset);
     return Post.findAll({
       where: { userId },
       include: [{
@@ -24,21 +29,41 @@ async function getPostList({
       offset,
     });
   }
+
   if (tag) {
-    const tagAndPosts = await Tag.findOne({
+    const searchTag = await Tag.findOne({
       where: { value: tag },
       include: [{
         model: Post,
+        attributes: ['id'],
         through: {
           model: PostTag,
           attributes: [],
         },
       }],
     });
-    return tagAndPosts;
+
+    const postIds = searchTag.posts.map((post) => post.id);
+
+    if (postIds.length === 0) {
+      return { tag, posts: [] };
+    }
+
+    if (offset > postIds.length) throw new BadRequest(ErrorMessages.invalid_value_offset);
+
+    const searchPosts = await Post.findAll({
+      where: { id: postIds },
+      limit,
+      offset,
+    });
+    console.log('SEARCH POSTS: ', searchPosts);
+    return { tag, searchPosts };
   }
 
-  const postsAndTags = await Post.findAll({
+  const postCount = await Post.count();
+  if (offset > postCount) throw new BadRequest(ErrorMessages.invalid_value_offset);
+
+  const posts = await Post.findAll({
     include: [{
       model: Tag,
       through: {
@@ -49,9 +74,10 @@ async function getPostList({
     order: [['createdAt', typeOfSort]],
     limit,
     offset,
+
   });
-    // return postTag.map((p) => p.get());
-  return postsAndTags;
+  // return postTag.map((p) => p.get());
+  return posts;
 }
 
 // получить конкретный пост пользователя
