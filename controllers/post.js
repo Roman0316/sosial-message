@@ -43,20 +43,17 @@ async function getPostList({
       }],
     });
 
-    const postIds = searchTag.posts.map((post) => post.id);
-
-    if (postIds.length === 0) {
+    const postId = searchTag.posts.map((post) => post.id);
+    if (postId.length === 0) {
       return { tag, posts: [] };
     }
 
-    if (offset > postIds.length) throw new BadRequest(ErrorMessages.invalid_value_offset);
-
+    if (offset > postId.length) throw new BadRequest(ErrorMessages.invalid_value_offset);
     const searchPosts = await Post.findAll({
-      where: { id: postIds },
+      where: { id: postId },
       limit,
       offset,
     });
-    console.log('SEARCH POSTS: ', searchPosts);
     return { tag, searchPosts };
   }
 

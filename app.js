@@ -1,7 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const { authRouter, userRouter, postRouter } = require('./routers/index');
+const {
+  authRouter, userRouter, postRouter, tagRouter,
+} = require('./routers/index');
 const { ErrorHandler, authMiddleware } = require('./middlewares/index');
 
 const app = express();
@@ -18,6 +20,7 @@ app.use('/api/auth', authRouter);
 app.use(authMiddleware);
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
+app.use('/api/tags', tagRouter);
 
 app.use(ErrorHandler);
 

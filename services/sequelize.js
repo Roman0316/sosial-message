@@ -28,6 +28,7 @@ Tag.associate(sequelize.models);
 PostTag.associate(sequelize.models);
 
 module.exports = {
+  Sequelize,
   sequelize,
   User,
   Post,
