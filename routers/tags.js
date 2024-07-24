@@ -12,7 +12,7 @@ const tagRouter = Router();
 tagRouter.get(
   '/',
   wrap(async (req, res) => {
-    const tags = await tagController.getTagsList(req.query);
+    const tags = await tagController.getTagList(req.query);
     res.json(tags);
   }),
 );

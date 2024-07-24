@@ -4,7 +4,7 @@ const {
 
 const { Tag, Post, PostTag } = require('../models/index');
 
-async function getTagsList({ q }) {
+async function getTagList({ q }) {
   if (q) {
     const tags = await Tag.findAll({
       where: { value: { [Op.like]: `%${q}%` } },
@@ -46,5 +46,5 @@ async function getTagsList({ q }) {
 }
 
 module.exports = {
-  getTagsList,
+  getTagList,
 };

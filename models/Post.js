@@ -50,5 +50,18 @@ module.exports = class Post extends BaseModel {
       },
       through: models.postTag,
     });
+
+    Post.hasMany(models.like, {
+      foreignKey: 'postId',
+      allowNull: false,
+    });
+
+    Post.belongsToMany(models.user, {
+      foreignKey: {
+        name: 'userId',
+        allowNull: true,
+      },
+      through: models.like,
+    });
   }
 };
