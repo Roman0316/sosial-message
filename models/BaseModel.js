@@ -10,10 +10,13 @@ module.exports = class BaseModel extends Model {
 
   static dateKeys = ['createdAt', 'updatedAt', 'deletedAt'];
 
+  static Settings = {};
+
   static initialize(sequelize) {
     super.init(this.Schema, {
       modelName: this.modelName,
       tableName: this.tableName,
+      ...this.Settings,
       sequelize,
     });
   }

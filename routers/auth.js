@@ -20,8 +20,8 @@ authRouter.post(
   '/login',
   validateRequest(loginRequest),
   wrap(async (req, res) => {
-    const token = await authController.loginUser(req.body);
-    res.json(token);
+    const accessToken = await authController.loginUser(req.body);
+    res.json({ accessToken });
   }),
 );
 

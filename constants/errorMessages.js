@@ -9,6 +9,8 @@ const ErrorMessages = {
 
   user_not_found: 'user_not_found',
 
+  user_or_post_not_found: 'user_or_post_not_found',
+
   invalid_value_offset: 'invalid_value_offset',
 };
 

@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const {
-  authRouter, userRouter, postRouter, tagRouter,
+  authRouter, userRouter, postRouter, tagRouter, likeRouter,
 } = require('./routers/index');
 const { ErrorHandler, authMiddleware } = require('./middlewares/index');
 
@@ -21,6 +21,7 @@ app.use(authMiddleware);
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
 app.use('/api/tags', tagRouter);
+app.use('/api/likes', likeRouter);
 
 app.use(ErrorHandler);
 

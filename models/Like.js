@@ -1,5 +1,3 @@
-// const { DataTypes } = require('sequelize');
-
 const BaseModel = require('./BaseModel');
 
 module.exports = class Like extends BaseModel {
@@ -10,6 +8,8 @@ module.exports = class Like extends BaseModel {
   static protectedKeys = ['createdAt'];
 
   static schema = {};
+
+  static Settings = { updatedAt: false };
 
   static associate(models) {
     Like.belongsTo(models.post, {

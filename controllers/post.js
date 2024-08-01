@@ -1,83 +1,59 @@
+const { Op, fn, col } = require('sequelize');
 const { BadRequest } = require('http-errors');
 
 const { ErrorMessages } = require('../constants/index');
-
 const {
-  Post, User, Tag, PostTag,
+  Post, User, Tag, PostTag, Like,
 } = require('../models/index');
 
-// получить посты с фильтрами
+// !!!получить посты с фильтрами
 async function getPostList({
-  tag, limit, offset, typeOfSort, userId,
+  tag: tagValue, limit = 20, offset = 0, typeOfSort = 'DESC', userId,
 }) {
-  if (userId) {
-    const userPostCount = await Post.count({
-      where: { userId },
-    });
-    if (offset > userPostCount) throw new BadRequest(ErrorMessages.invalid_value_offset);
-    return Post.findAll({
-      where: { userId },
-      include: [{
-        model: Tag,
-        through: {
-          model: PostTag,
-          attributes: [],
-        },
-      }],
-      order: [['createdAt', typeOfSort]],
-      limit,
-      offset,
-    });
-  }
+  const user = userId ? await User.findOneOrFail({ where: { id: userId } }) : null;
+  const tag = tagValue ? await Tag.findOne({ where: { value: tagValue } }) : null;
 
-  if (tag) {
-    const searchTag = await Tag.findOne({
-      where: { value: tag },
-      include: [{
-        model: Post,
-        attributes: ['id'],
-        through: {
-          model: PostTag,
-          attributes: [],
-        },
-      }],
-    });
-
-    const postId = searchTag.posts.map((post) => post.id);
-    if (postId.length === 0) {
-      return { tag, posts: [] };
-    }
-
-    if (offset > postId.length) throw new BadRequest(ErrorMessages.invalid_value_offset);
-    const searchPosts = await Post.findAll({
-      where: { id: postId },
-      limit,
-      offset,
-    });
-    return { tag, searchPosts };
-  }
-
-  const postCount = await Post.count();
-  if (offset > postCount) throw new BadRequest(ErrorMessages.invalid_value_offset);
-
-  const posts = await Post.findAll({
+  const options = {
+    /* attributes: {
+      include: [[fn('COUNT', 'likes."postId"'), 'likeCount']],
+    }, */
+    ...(user && { where: { userId: user.id } }),
     include: [{
       model: Tag,
       through: {
         model: PostTag,
+        ...(tag && { where: { tagId: tag.id } }),
         attributes: [],
       },
-    }],
+    },
+    {
+      model: Like,
+      // attributes: [],
+    },
+    {
+      model: User,
+      attributes: ['firstName', 'id'],
+    },
+    ],
+    // group: ['post.id', 'user.id'],
     order: [['createdAt', typeOfSort]],
+  };
+
+  /* const postsCount = await Post.count(options);
+  if (offset > postsCount) throw new BadRequest(ErrorMessages.invalid_value_offset); */
+
+  const posts = await Post.findAll({
+    ...options,
     limit,
     offset,
-
   });
-  // return postTag.map((p) => p.get());
-  return posts;
+
+  return {
+    /* postsCount, */ posts,
+  };
 }
 
-// получить конкретный пост пользователя
+// !!!получить конкретный пост пользователя
 async function getPost({ id: userId }, { postId }) {
   const post = await Post.findOne({
     where: {
@@ -85,33 +61,67 @@ async function getPost({ id: userId }, { postId }) {
       userId,
     },
     attributes: {
-      exclude: ['id', 'userId', 'isPublished'],
+      include: [[fn('COUNT', col('postId')), 'likeCount']],
+      exclude: ['isPublished'],
     },
     include: [{
       model: User,
       as: 'user',
       attributes: ['firstName', 'id'],
+    },
+    {
+      model: Like,
+      attributes: [],
     }],
+    group: ['post.id', 'user.id'],
   });
-  return post.get();
+  return post ? post.get() : null;
 }
 
-// создать пост
-async function createPost({ id: userId }, { text, tags }) {
-  const tagResult = await Promise.all(tags.map((value) => Tag.findOrCreate({ where: { value } })));
-  const tag = tagResult.map((result) => result[0]);
-
+// !!!создать пост
+async function createPost({ id: userId }, { text, tags = [] }) {
   const post = await Post.create({
     userId,
     text,
   });
 
-  await PostTag.create({ postId: post.id, tagId: tag[0].id });
+  if (tags.length) {
+    console.log('tags', tags);
 
-  return { post, tag };
+    const existingTags = await Tag.findAll({ where: { value: { [Op.in]: tags } } });
+
+    console.log('existingTags', existingTags.map((t) => t.get()));
+
+    const existingTagValues = existingTags.map(({ value }) => value);
+
+    console.log('existingTagValues', existingTagValues);
+
+    const tagsToCreate = tags.filter((tag) => !existingTagValues.includes(tag));
+
+    console.log('tagsToCreate', tagsToCreate);
+
+    const newTags = await Tag.bulkCreate(tagsToCreate.map((value) => ({ value })));
+
+    console.log('newTags', newTags.map((t) => t.get()));
+
+    await PostTag.bulkCreate([...existingTags, ...newTags].map((tag) => ({
+      postId: post.id,
+      tagId: tag.id,
+    })), { returning: false });
+  }
+
+  return post.reload({
+    include: [{
+      model: Tag,
+      through: {
+        model: PostTag,
+        attributes: [],
+      },
+    }],
+  });
 }
 
-// изменить пост
+// !!!изменить пост
 async function updatePost({ id: userId }, { postId }, {
   text,
 }) {
@@ -135,7 +145,7 @@ async function updatePost({ id: userId }, { postId }, {
   return post.get();
 }
 
-// удалить конкретный пост пользователя
+// !!!удалить конкретный пост пользователя
 async function deletePost({ id }, { postId }) {
   await Post.destroy({
     where: {
