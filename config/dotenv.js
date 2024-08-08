@@ -27,8 +27,18 @@ const dbConfig = {
 const production = dbConfig;
 const development = dbConfig;
 
+// S3 Minio
+const s3Config = {
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_KEY,
+  endpoint: process.env.S3_EXTERNAL_ENDPOINT,
+  s3ForcePathStyle: true,
+  signatureVersion: 'v4',
+};
+
 module.exports = {
   dbConfig,
+  s3Config,
   PORT,
   production,
   development,

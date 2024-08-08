@@ -14,12 +14,23 @@ async function getPostList({
   const tag = tagValue ? await Tag.findOne({ where: { value: tagValue } }) : null;
 
   const options = {
-    /* attributes: {
-      include: [[fn('COUNT', 'likes."postId"'), 'likeCount']],
-    }, */
     ...(user && { where: { userId: user.id } }),
-    include: [{
+    include: [
+      {
+        model: User,
+        attributes: { exclude: ['password'] },
+      },
+    ],
+    order: [['createdAt', typeOfSort]],
+  };
+
+  const count = await Post.count(options);
+  if (offset > count) throw new BadRequest(ErrorMessages.invalid_value_offset);
+
+  options.include.push(
+    {
       model: Tag,
+      duplicating: false,
       through: {
         model: PostTag,
         ...(tag && { where: { tagId: tag.id } }),
@@ -28,28 +39,25 @@ async function getPostList({
     },
     {
       model: Like,
-      // attributes: [],
+      attributes: [],
+      duplicating: false,
     },
-    {
-      model: User,
-      attributes: ['firstName', 'id'],
-    },
-    ],
-    // group: ['post.id', 'user.id'],
-    order: [['createdAt', typeOfSort]],
-  };
-
-  /* const postsCount = await Post.count(options);
-  if (offset > postsCount) throw new BadRequest(ErrorMessages.invalid_value_offset); */
-
+  );
   const posts = await Post.findAll({
     ...options,
+    attributes: {
+      include: [
+        [fn('COUNT', col('likes."postId"')), 'likeCount'],
+      ],
+    },
+    group: ['post.id', 'user.id', 'tags.id'],
     limit,
     offset,
   });
 
   return {
-    /* postsCount, */ posts,
+    count,
+    posts,
   };
 }
 
