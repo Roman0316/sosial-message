@@ -1,10 +1,15 @@
-const { Op, fn, col } = require('sequelize');
+const {
+  Op, fn, col,
+} = require('sequelize');
 const { BadRequest } = require('http-errors');
+const { v4: uuid } = require('uuid');
 
 const { ErrorMessages } = require('../constants/index');
 const {
-  Post, User, Tag, PostTag, Like,
+  Post, User, Tag, PostTag, Like, File, PostFile,
 } = require('../models/index');
+const { s3Config } = require('../config/dotenv');
+const { putObject } = require('../services/s3');
 
 // !!!получить посты с фильтрами
 async function getPostList({
@@ -87,36 +92,53 @@ async function getPost({ id: userId }, { postId }) {
 }
 
 // !!!создать пост
-async function createPost({ id: userId }, { text, tags = [] }) {
+async function createPost({ id: userId }, { text, tags = [] }, file) {
   const post = await Post.create({
     userId,
     text,
   });
 
+  console.log('Tags: ', tags);
+
+  // const { endpoint, bucket } = s3Config;
+  // const location = `${endpoint}/${bucket}/${key}`;
+
   if (tags.length) {
-    console.log('tags', tags);
-
+    // console.log('tags', tags);
     const existingTags = await Tag.findAll({ where: { value: { [Op.in]: tags } } });
-
-    console.log('existingTags', existingTags.map((t) => t.get()));
-
+    // console.log('existingTags', existingTags.map((t) => t.get()));
     const existingTagValues = existingTags.map(({ value }) => value);
-
-    console.log('existingTagValues', existingTagValues);
-
+    // console.log('existingTagValues', existingTagValues);
     const tagsToCreate = tags.filter((tag) => !existingTagValues.includes(tag));
-
-    console.log('tagsToCreate', tagsToCreate);
-
+    // console.log('tagsToCreate', tagsToCreate);
     const newTags = await Tag.bulkCreate(tagsToCreate.map((value) => ({ value })));
-
-    console.log('newTags', newTags.map((t) => t.get()));
+    // console.log('newTags', newTags.map((t) => t.get()));
 
     await PostTag.bulkCreate([...existingTags, ...newTags].map((tag) => ({
       postId: post.id,
       tagId: tag.id,
     })), { returning: false });
   }
+
+  if (file) {
+    const {
+      originalname, mimetype, size, buffer,
+    } = file;
+    const key = `${uuid()}.png`;
+    await putObject(key, buffer, mimetype);
+
+    const dataFile = await File.create({
+      name: originalname,
+      mimeType: mimetype,
+      size,
+      s3Key: key,
+    });
+    await PostFile.create({
+      postId: post.id,
+      fileId: dataFile.id,
+    });
+  }
+  // const allData = { ...post, ...tagsTo, ...dataFile };
 
   return post.reload({
     include: [{
@@ -125,8 +147,36 @@ async function createPost({ id: userId }, { text, tags = [] }) {
         model: PostTag,
         attributes: [],
       },
+    },
+    {
+      model: File,
+      through: {
+        model: PostFile,
+        attributes: [],
+      },
     }],
   });
+}
+
+// upload to S3
+async function uploadFileToS3(file) {
+  const {
+    originalname, mimetype, size, buffer,
+  } = file;
+  const key = `${uuid()}.png`;
+  await putObject(key, buffer, mimetype);
+
+  const dataFile = await File.create({
+    name: originalname,
+    mimeType: mimetype,
+    size,
+    s3Key: key,
+  });
+  /* await PostFile.create({
+    postId: post.id,
+    fileId: dataFile.id,
+  }); */
+  return dataFile;
 }
 
 // !!!изменить пост
@@ -169,4 +219,5 @@ module.exports = {
   getPost,
   updatePost,
   deletePost,
+  uploadFileToS3,
 };

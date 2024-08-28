@@ -1,14 +1,18 @@
 const AWS = require('aws-sdk');
 
-const s3Config = require('../config/dotenv');
+const { s3Config } = require('../config/dotenv');
 
-const s3 = new AWS.S3(s3Config);
+const { bucket, ...option } = s3Config;
 
-async function putObject(bucketName, filePath, fileContent) {
+const s3 = new AWS.S3(option);
+
+async function putObject(Key, Body, ContentType, Bucket = bucket) {
   const params = {
-    Bucket: bucketName,
-    Key: filePath,
-    Body: fileContent,
+    Bucket,
+    Key,
+    Body,
+    ContentType,
+    ACL: 'public-read',
   };
 
   try {

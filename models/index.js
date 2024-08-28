@@ -3,6 +3,8 @@ const Post = require('./Post');
 const Tag = require('./Tag');
 const PostTag = require('./PostTag');
 const Like = require('./Like');
+const File = require('./File');
+const PostFile = require('./PostFile');
 
 module.exports = {
   User,
@@ -10,4 +12,6 @@ module.exports = {
   Tag,
   PostTag,
   Like,
+  File,
+  PostFile,
 };

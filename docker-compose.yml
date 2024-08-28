@@ -10,6 +10,7 @@ services:
       - "${PGPORT}:${PGPORT}"  
   s3:
     image: minio/minio
+    restart: unless-stopped
     env_file:
       - .env
     environment:

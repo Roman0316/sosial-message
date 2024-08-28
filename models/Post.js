@@ -48,7 +48,7 @@ module.exports = class Post extends BaseModel {
       allowNull: false,
     });
 
-    Post.hasMany(models.postFiles, {
+    Post.hasMany(models.postFile, {
       foreignKey: 'postId',
       allowNull: false,
     });
