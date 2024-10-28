@@ -31,26 +31,6 @@ async function getTagList({ q }) {
   });
 }
 
-/* с помощью spread-оператора:
-  async function getTagList({ q }) {
-  return Tag.findAll({
-  ...(q && { where: { value: { [Op.like]: `%${q}%` } } }),
-  attributes: {
-    include: [[fn('COUNT', col('posts.id')), 'postCount']],
-  },
-  include: [{
-    model: Post,
-    attributes: [],
-    through: {
-      model: PostTag,
-      attributes: [],
-    },
-  }],
-  group: ['tag.id'],
-  order: [literal('COUNT("posts"."id") DESC')],
-});
-} */
-
 module.exports = {
   getTagList,
 };

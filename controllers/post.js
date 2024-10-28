@@ -11,7 +11,7 @@ const {
 const { s3Config } = require('../config/dotenv');
 const { putObject } = require('../services/s3');
 
-// !!!получить посты с фильтрами
+// получить посты с фильтрами
 async function getPostList({
   tag: tagValue, limit = 20, offset = 0, typeOfSort = 'DESC', userId,
 }) {
@@ -66,7 +66,7 @@ async function getPostList({
   };
 }
 
-// !!!получить конкретный пост пользователя
+// получить конкретный пост пользователя
 async function getPost({ id: userId }, { postId }) {
   const post = await Post.findOne({
     where: {
@@ -91,28 +91,21 @@ async function getPost({ id: userId }, { postId }) {
   return post ? post.get() : null;
 }
 
-// !!!создать пост
+// создать пост
 async function createPost({ id: userId }, { text, tags = [] }, file) {
   const post = await Post.create({
     userId,
     text,
   });
 
-  console.log('Tags: ', tags);
-
   // const { endpoint, bucket } = s3Config;
   // const location = `${endpoint}/${bucket}/${key}`;
 
   if (tags.length) {
-    // console.log('tags', tags);
     const existingTags = await Tag.findAll({ where: { value: { [Op.in]: tags } } });
-    // console.log('existingTags', existingTags.map((t) => t.get()));
     const existingTagValues = existingTags.map(({ value }) => value);
-    // console.log('existingTagValues', existingTagValues);
     const tagsToCreate = tags.filter((tag) => !existingTagValues.includes(tag));
-    // console.log('tagsToCreate', tagsToCreate);
     const newTags = await Tag.bulkCreate(tagsToCreate.map((value) => ({ value })));
-    // console.log('newTags', newTags.map((t) => t.get()));
 
     await PostTag.bulkCreate([...existingTags, ...newTags].map((tag) => ({
       postId: post.id,

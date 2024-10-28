@@ -2,10 +2,6 @@ const { Router } = require('express');
 
 const wrap = require('../utils/wrap');
 const { tagController } = require('../controllers/index');
-/* const { validateRequest } = require('../middlewares/index');
-const {
-  getPostListRequest, getPostRequest, createPostRequest, updatePostRequest, deletePostRequest,
-} = require('../requests/post/index'); */
 
 const tagRouter = Router();
 
