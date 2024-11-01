@@ -43,7 +43,6 @@ postRouter.post(
   '/test',
   upload.single('file'),
   wrap(async (req, res) => {
-    // const fileBuffer = req.file ? req.file.buffer : null;
     const post = await postController.uploadFileToS3(req.file);
     res.status(201).json(post);
   }),

@@ -4,11 +4,11 @@ const {
 const { BadRequest } = require('http-errors');
 const { v4: uuid } = require('uuid');
 
-const { ErrorMessages } = require('../constants/index');
+const { ErrorMessages } = require('../constants/errorMessages');
 const {
   Post, User, Tag, PostTag, Like, File, PostFile,
 } = require('../models/index');
-const { s3Config } = require('../config/dotenv');
+// const { s3Config } = require('../config/dotenv');
 const { putObject } = require('../services/s3');
 
 // получить посты с фильтрами
@@ -97,7 +97,6 @@ async function createPost({ id: userId }, { text, tags = [] }, file) {
     userId,
     text,
   });
-
   // const { endpoint, bucket } = s3Config;
   // const location = `${endpoint}/${bucket}/${key}`;
 
@@ -133,6 +132,18 @@ async function createPost({ id: userId }, { text, tags = [] }, file) {
   }
   // const allData = { ...post, ...tagsTo, ...dataFile };
 
+  try {
+    const body = {
+      userId,
+      action: 'POST_CREATED',
+    };
+    const response = await (await fetch('http://localhost:3000/api/postHistory', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } })).json();
+    // eslint-disable-next-line no-console
+    console.log('response', response);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Failed to write post history with userId ${userId}, error: ${error}`);
+  }
   return post.reload({
     include: [{
       model: Tag,
@@ -193,17 +204,44 @@ async function updatePost({ id: userId }, { postId }, {
     text,
   });
   await post.save();
+
+  try {
+    const body = {
+      userId,
+      action: `${postId} POST_UPDATED`,
+    };
+    const response = await (await fetch('http://localhost:3000/api/postHistory', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } })).json();
+    // eslint-disable-next-line no-console
+    console.log('response', response);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Failed to write post history with userId ${userId}, error: ${error}`);
+  }
+
   return post.get();
 }
 
 // !!!удалить конкретный пост пользователя
-async function deletePost({ id }, { postId }) {
+async function deletePost({ id: userId }, { postId }) {
   await Post.destroy({
     where: {
       id: postId,
-      userId: id,
+      userId,
     },
   });
+
+  try {
+    const body = {
+      userId,
+      action: `${postId} POST_DELETED`,
+    };
+    const response = await (await fetch('http://localhost:3000/api/postHistory', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } })).json();
+    // eslint-disable-next-line no-console
+    console.log('response', response);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Failed to write post history with userId ${userId}, error: ${error}`);
+  }
 }
 
 module.exports = {

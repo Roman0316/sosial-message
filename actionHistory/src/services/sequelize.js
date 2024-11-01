@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 const { dbConfig } = require('../config/dotenv');
 
 const {
-  User, Post, Tag, PostTag, Like, File, PostFile, AuthHistory, ProfileHistory, PostHistorys,
+  User, Post, Tag, PostTag, Like, File, PostFile, AuthHistory, ProfileHistory, PostHistory,
 } = require('../models/index');
 
 const {
@@ -25,7 +25,7 @@ File.initialize(sequelize);
 PostFile.initialize(sequelize);
 AuthHistory.initialize(sequelize);
 ProfileHistory.initialize(sequelize);
-PostHistorys.initialize(sequelize);
+PostHistory.initialize(sequelize);
 
 // associate models
 User.associate(sequelize.models);
@@ -45,5 +45,5 @@ module.exports = {
   Like,
   AuthHistory,
   ProfileHistory,
-  PostHistorys,
+  PostHistory,
 };

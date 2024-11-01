@@ -7,7 +7,7 @@ const File = require('./File');
 const PostFile = require('./PostFile');
 const AuthHistory = require('./authHistory');
 const ProfileHistory = require('./ProfileHistory');
-const PostHistorys = require('./PostHistory');
+const PostHistory = require('./PostHistory');
 
 module.exports = {
   User,
@@ -19,5 +19,5 @@ module.exports = {
   PostFile,
   AuthHistory,
   ProfileHistory,
-  PostHistorys,
+  PostHistory,
 };

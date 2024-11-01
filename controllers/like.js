@@ -1,6 +1,6 @@
 const { BadRequest } = require('http-errors');
 
-const { ErrorMessages } = require('../constants/index');
+const { ErrorMessages } = require('../constants/errorMessages');
 const { Like, Post, User } = require('../models/index');
 
 // создатёт лайк

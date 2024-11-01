@@ -1,0 +1,27 @@
+{
+  "name": "action-history",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Roman",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "sequelize": "^6.20.1",
+    "sequelize-cli": "^6.4.1",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "nodemon": "^3.0.2"
+  }
+}
