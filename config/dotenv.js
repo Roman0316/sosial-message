@@ -5,6 +5,7 @@ const PORT = process.env.API_PORT;
 
 // JWT Secret
 const secret = process.env.JWT_ACCESS_SECRET_KEY;
+const EX = process.env.TOKEN_EXPIRATION;
 
 // First Admin
 const admin = {
@@ -21,6 +22,13 @@ const dbConfig = {
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
   dialect: 'postgres',
+};
+
+// Redis
+const redisConfig = {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASSWORD,
 };
 
 // sequelize cli required environments
@@ -40,10 +48,12 @@ const s3Config = {
 
 module.exports = {
   dbConfig,
+  redisConfig,
   s3Config,
   PORT,
   production,
   development,
   secret,
   admin,
+  EX,
 };

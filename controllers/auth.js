@@ -3,6 +3,8 @@ const { BadRequest, Unauthorized } = require('http-errors');
 const { User } = require('../models/index');
 const ErrorMessages = require('../constants/errorMessages');
 const { hashPassword, comparePasswords, generateAccessToken } = require('../utils/authHelpers');
+const { set, del } = require('../services/redis');
+const { EX } = require('../config/dotenv');
 
 async function registerUser({ firstName, email, password }) {
   const candidat = await User.findOne({
@@ -37,7 +39,7 @@ async function loginUser({ email, password }) {
   const validPassword = await comparePasswords(password, user.password);
   if (!validPassword) throw new Unauthorized(ErrorMessages.auth_invalid_email_or_password);
 
-  try {
+  /* try {
     const body = {
       userEmail: user.email,
       action: 'USER_ARE_LOGINED',
@@ -48,12 +50,19 @@ async function loginUser({ email, password }) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Failed to write authenticate history with user email ${user.email}, error: ${error}`);
-  }
-
-  return generateAccessToken({
+  } */
+  const token = generateAccessToken({
     id: user.id,
     email: user.email,
   });
+
+  try {
+    await set(user.id, token, EX);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error saving token to redis');
+  }
+  return token;
 }
 
 async function changePassword({ email }, { currentPassword, password }) {
@@ -78,8 +87,13 @@ async function changePassword({ email }, { currentPassword, password }) {
   return user.save();
 }
 
+async function logout({ id: userId }) {
+  await del(userId);
+}
+
 module.exports = {
   registerUser,
   loginUser,
   changePassword,
+  logout,
 };

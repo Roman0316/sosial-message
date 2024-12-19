@@ -4,6 +4,7 @@ const wrap = require('../utils/wrap');
 const { authController } = require('../controllers/index');
 const { validateRequest, authMiddleware } = require('../middlewares/index');
 const { registrationRequest, loginRequest, changePasswordRequest } = require('../requests/auth/index');
+const { user } = require('../constants/userRoles');
 
 const authRouter = Router();
 
@@ -32,6 +33,15 @@ authRouter.patch(
   wrap(async (req, res) => {
     await authController.changePassword(req.user, req.data);
     res.status(204).end();
+  }),
+);
+
+authRouter.delete(
+  '/logout',
+  authMiddleware,
+  wrap(async (req, res) => {
+    await authController.logout(req.user);
+    res.status(200).end();
   }),
 );
 

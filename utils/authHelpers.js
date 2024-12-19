@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { BadRequest } = require('http-errors');
 
 const ErrorMessages = require('../constants/index');
-const { secret } = require('../config/dotenv');
+const { secret, EX } = require('../config/dotenv');
 
 function hashPassword(password) {
   return bcrypt.hash(password, 7);
@@ -18,7 +18,7 @@ function generateAccessToken(payload) {
     { ...payload },
     secret,
     {
-      expiresIn: '1d',
+      expiresIn: EX,
     },
   );
 }
